@@ -1,4 +1,5 @@
 class Config:
+    Worker_ID = None
     Username = None
     User_id = None
     Search = None

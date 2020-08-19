@@ -57,6 +57,7 @@ def createIndex(config, instance, **scope):
                 "mappings": {
                     "properties": {
                         "id": {"type": "long"},
+                        "worker_id": {"type": "long"},
                         "conversation_id": {"type": "long"},
                         "created_at": {"type": "long"},
                         "date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
@@ -218,6 +219,7 @@ def Tweet(Tweet, config):
             "_id": str(Tweet.id) + "_raw_" + config.Essid,
             "_source": {
                 "id": str(Tweet.id),
+                "worker_id": config.Worker_ID,
                 "conversation_id": Tweet.conversation_id,
                 "created_at": Tweet.datetime,
                 "date": dt,
@@ -311,6 +313,7 @@ def Follow(user, config):
             "_index": config.Index_follow,
             "_id": _user + "_" + _follow + "_" + config.Essid,
             "_source": {
+                "worker_id": config.Worker_ID,
                 "user": _user,
                 "follow": _follow,
                 "essid": config.Essid
@@ -334,6 +337,7 @@ def UserProfile(user, config):
             "_index": config.Index_users,
             "_id": user.id + "_" + user.join_date + "_" + user.join_time + "_" + config.Essid,
             "_source": {
+                "worker_id": config.Worker_ID,
                 "id": user.id,
                 "name": user.name,
                 "username": user.username,

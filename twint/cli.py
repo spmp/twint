@@ -71,6 +71,7 @@ def initialize(args):
     """ Set default values for config from args
     """
     c = config.Config()
+    c.Worker_ID = args.worker_id
     c.Username = args.username
     c.User_id = args.userid
     c.Search = args.search
@@ -118,7 +119,7 @@ def initialize(args):
     c.Tor_control_password = args.tor_control_password
     c.Retweets = args.retweets
     c.Custom_query = args.custom_query
-    c.Popular_tweets =  args.popular_tweets
+    c.Popular_tweets = args.popular_tweets
     c.Skip_certs = args.skip_certs
     c.Hide_output = args.hide_output
     c.Native_retweets = args.native_retweets
@@ -141,6 +142,7 @@ def options():
     ap = argparse.ArgumentParser(prog="twint",
                                  usage="python3 %(prog)s [options]",
                                  description="TWINT - An Advanced Twitter Scraping Tool.")
+    ap.add_argument("-w", "--worker-id", type=int, default=0, help="ID to assign to this worker node. Integer")
     ap.add_argument("-u", "--username", help="User's Tweets you want to scrape.")
     ap.add_argument("-s", "--search", help="Search for Tweets containing this word or phrase.")
     ap.add_argument("-g", "--geo", help="Search for geocoded Tweets.")
