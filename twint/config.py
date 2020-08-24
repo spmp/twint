@@ -9,6 +9,10 @@ class Config:
     Lang = None
     Output = None
     Elasticsearch = None
+    Elasticsearch_useSSL = None
+    Elasticsearch_cert = None
+    Elasticsearch_user = None
+    Elasticsearch_pass = None
     Year = None
     Since = None
     Until = None

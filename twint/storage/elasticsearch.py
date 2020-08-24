@@ -196,6 +196,22 @@ def weekday(day):
 def hour(datetime):
     return strftime("%H", localtime(datetime))
 
+def ElasticsearchConnect(config):
+    if config.Elasticsearch_cert:
+        return Elasticsearch(
+            config.Elasticsearch, verify_certs=config.Skip_certs,
+            scheme="https",
+            ca_certs=config.Elasticsearch_cert,
+            http_auth=(config.Elasticsearch_user, config.Elasticsearch_pass)
+        )
+    elif config.Elasticsearch_user:
+        return Elasticsearch(
+            config.Elasticsearch, verify_certs=config.Skip_certs,
+            http_auth=(config.Elasticsearch_user, config.Elasticsearch_pass)
+        )
+    else:
+        return Elasticsearch(config.Elasticsearch, verify_certs=config.Skip_certs)
+
 def Tweet(Tweet, config):
     global _index_tweet_status
     global _is_near_def
@@ -292,7 +308,7 @@ def Tweet(Tweet, config):
 
     actions.append(j_data)
 
-    es = Elasticsearch(config.Elasticsearch, verify_certs=config.Skip_certs)
+    es = ElasticsearchConnect(config)
     if not _index_tweet_status:
         _index_tweet_status = createIndex(config, es, scope="tweet")
     with nostdout():
@@ -321,7 +337,7 @@ def Follow(user, config):
             }
     actions.append(j_data)
 
-    es = Elasticsearch(config.Elasticsearch, verify_certs=config.Skip_certs)
+    es = ElasticsearchConnect(config)
     if not _index_follow_status:
         _index_follow_status = createIndex(config, es, scope="follow")
     with nostdout():
@@ -364,7 +380,7 @@ def UserProfile(user, config):
             j_data["_source"].update({"geo_user": _location})
     actions.append(j_data)
 
-    es = Elasticsearch(config.Elasticsearch, verify_certs=config.Skip_certs)
+    es = ElasticsearchConnect(config)
     if not _index_user_status:
         _index_user_status = createIndex(config, es, scope="user")
     with nostdout():

@@ -81,6 +81,9 @@ def initialize(args):
     c.Lang = args.lang
     c.Output = args.output
     c.Elasticsearch = args.elasticsearch
+    c.Elasticsearch_cert = args.elasticsearch_cert
+    c.Elasticsearch_user = args.elasticsearch_username
+    c.Elasticsearch_pass = args.elasticsearch_password
     c.Year = args.year
     c.Since = args.since
     c.Until = args.until
@@ -151,6 +154,9 @@ def options():
     ap.add_argument("-l", "--lang", help="Search for Tweets in a specific language.")
     ap.add_argument("-o", "--output", help="Save output to a file.")
     ap.add_argument("-es", "--elasticsearch", help="Index to Elasticsearch.")
+    ap.add_argument("-esssl", "--elasticsearch-cert", help="SSL CA certificte for use with SSL enabled")
+    ap.add_argument("-esuser", "--elasticsearch-username", help="Elasticsearch user")
+    ap.add_argument("-espass", "--elasticsearch-password", help="Elasticsearch password")
     ap.add_argument("--year", help="Filter Tweets before specified year.")
     ap.add_argument("--since", help="Filter Tweets sent since date (Example: \"2017-12-27 20:30:15\" or 2017-12-27).",
                     metavar="DATE")
@@ -236,6 +242,13 @@ def options():
     ap.add_argument("--backoff-exponent", help="Specify a exponent for the polynomial backoff in case of errors.", type=float, default=3.0)
     ap.add_argument("--min-wait-time", type=float, default=15, help="specifiy a minimum wait time in case of scraping limit error. This value will be adjusted by twint if the value provided does not satisfy the limits constraints")
     args = ap.parse_args()
+
+    # Ensure that if an Elasticsearch certificate is set a username and password are too
+    if args.elasticsearch_cert and (args.elasticsearch_username is None or args.elasticsearch_password is None):
+        ap.error("--elasticsearch-cert requires --elasticsearch-username and --elasticsearch-password to be set")
+    # Ensure that if an Elasticsearch username is set, the password is too
+    if args.elasticsearch_username and args.elasticsearch_password is None:
+        ap.error("--elasticsearch-username requires --elasticsearch-password to be set")
     
     return args
 
