@@ -76,6 +76,7 @@ def init(db):
                     cashtags text,
                     urls text,
                     photos text,
+                    thumbnail text,
                     quote_url text,
                     video integer,
                     geo text,
@@ -104,7 +105,7 @@ def init(db):
                 );
         """
         cursor.execute(table_retweets)
-    
+
         table_reply_to = """
             CREATE TABLE IF NOT EXISTS
                 replies(
@@ -245,7 +246,7 @@ def tweets(conn, Tweet, config):
         entry = (Tweet.id,
                     Tweet.id_str,
                     Tweet.tweet,
-                    Tweet.language,
+                    Tweet.lang,
                     Tweet.conversation_id,
                     Tweet.datetime,
                     Tweet.datestamp,
@@ -265,6 +266,7 @@ def tweets(conn, Tweet, config):
                     ",".join(Tweet.cashtags),
                     ",".join(Tweet.urls),
                     ",".join(Tweet.photos),
+                    Tweet.thumbnail,
                     Tweet.quote_url,
                     Tweet.video,
                     Tweet.geo,
@@ -274,7 +276,7 @@ def tweets(conn, Tweet, config):
                     Tweet.translate,
                     Tweet.trans_src,
                     Tweet.trans_dest)
-        cursor.execute('INSERT INTO tweets VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', entry)
+        cursor.execute('INSERT INTO tweets VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', entry)
 
         if config.Favorites:
             query = 'INSERT INTO favorites VALUES(?,?)'
@@ -284,7 +286,7 @@ def tweets(conn, Tweet, config):
             query = 'INSERT INTO retweets VALUES(?,?,?,?,?)'
             _d = datetime.timestamp(datetime.strptime(Tweet.retweet_date, "%Y-%m-%d %H:%M:%S"))
             cursor.execute(query, (int(Tweet.user_rt_id), Tweet.user_rt, Tweet.id, int(Tweet.retweet_id), _d))
-        
+
         if Tweet.reply_to:
             for reply in Tweet.reply_to:
                 query = 'INSERT INTO replies VALUES(?,?,?)'

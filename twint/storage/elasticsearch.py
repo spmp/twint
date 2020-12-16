@@ -1,7 +1,7 @@
 ## TODO - Fix Weekday situation
 from elasticsearch import Elasticsearch, helpers
 from geopy.geocoders import Nominatim
-from time import strftime, localtime
+from datetime import datetime
 import contextlib
 import sys
 
@@ -59,7 +59,7 @@ def createIndex(config, instance, **scope):
                         "id": {"type": "long"},
                         "worker_id": {"type": "long"},
                         "conversation_id": {"type": "long"},
-                        "created_at": {"type": "long"},
+                        "created_at": {"type": "text"},
                         "date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                         "timezone": {"type": "keyword"},
                         "place": {"type": "keyword"},
@@ -82,6 +82,7 @@ def createIndex(config, instance, **scope):
                         "nretweets": {"type": "integer"},
                         "quote_url": {"type": "text"},
                         "video": {"type":"integer"},
+                        "thumbnail": {"type":"text"},
                         "search": {"type": "text"},
                         "near": {"type": "text"},
                         "geo_near": {"type": "geo_point"},
@@ -193,9 +194,6 @@ def weekday(day):
 
     return weekdays[day]
 
-def hour(datetime):
-    return strftime("%H", localtime(datetime))
-
 def ElasticsearchConnect(config):
     if config.Elasticsearch_cert:
         return Elasticsearch(
@@ -215,18 +213,14 @@ def ElasticsearchConnect(config):
 def Tweet(Tweet, config):
     global _index_tweet_status
     global _is_near_def
-    weekdays = {
-            "Monday": 1,
-            "Tuesday": 2,
-            "Wednesday": 3,
-            "Thursday": 4,
-            "Friday": 5,
-            "Saturday": 6,
-            "Sunday": 7,
-            }
-    day = weekdays[strftime("%A", localtime(Tweet.datetime/1000))]
+    date_obj = datetime.strptime(Tweet.datetime, "%Y-%m-%d %H:%M:%S %Z")
 
     actions = []
+
+    try:
+        retweet = Tweet.retweet
+    except AttributeError:
+        retweet = None
 
     dt = f"{Tweet.datestamp} {Tweet.timestamp}"
 
@@ -248,10 +242,10 @@ def Tweet(Tweet, config):
                 "user_id_str": Tweet.user_id_str,
                 "username": Tweet.username,
                 "name": Tweet.name,
-                "day": day,
-                "hour": hour(Tweet.datetime/1000),
+                "day": date_obj.weekday(),
+                "hour": date_obj.hour,
                 "link": Tweet.link,
-                "retweet": Tweet.retweet,
+                "retweet": retweet,
                 "essid": config.Essid,
                 "nlikes": int(Tweet.likes_count),
                 "nreplies": int(Tweet.replies_count),
@@ -262,7 +256,7 @@ def Tweet(Tweet, config):
                 "near": config.Near
                 }
             }
-    if Tweet.retweet:
+    if retweet is not None:
         j_data["_source"].update({"user_rt_id": Tweet.user_rt_id})
         j_data["_source"].update({"user_rt": Tweet.user_rt})
         j_data["_source"].update({"retweet_id": Tweet.retweet_id})
@@ -274,6 +268,8 @@ def Tweet(Tweet, config):
         for photo in Tweet.photos:
             _photos.append(photo)
         j_data["_source"].update({"photos": _photos})
+    if Tweet.thumbnail:
+        j_data["_source"].update({"thumbnail": Tweet.thumbnail})
     if Tweet.mentions:
         _mentions = []
         for mention in Tweet.mentions:
