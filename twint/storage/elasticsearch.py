@@ -59,7 +59,7 @@ def createIndex(config, instance, **scope):
                         "id": {"type": "long"},
                         "worker_id": {"type": "long"},
                         "conversation_id": {"type": "long"},
-                        "created_at": {"type": "text"},
+                        "created_at": {"type": "long"},
                         "date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                         "timezone": {"type": "keyword"},
                         "place": {"type": "keyword"},
