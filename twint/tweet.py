@@ -86,7 +86,7 @@ def Tweet(tw, config):
     _dt = tw['created_at']
     _dt = datetime.strptime(_dt, '%a %b %d %H:%M:%S %z %Y')
     _dt = utc_to_local(_dt)
-    t.datetime = str(_dt.strftime(Tweet_formats['datetime']))
+    t.datetime = int(_dt.strftime(Tweet_formats['datetime']))
     # date is of the format year,
     t.datestamp = _dt.strftime(Tweet_formats['datestamp'])
     t.timestamp = _dt.strftime(Tweet_formats['timestamp'])
