@@ -230,7 +230,7 @@ def Tweet(Tweet, config):
                 "id": str(Tweet.id),
                 "worker_id": config.Worker_ID,
                 "conversation_id": Tweet.conversation_id,
-                "created_at": int(Tweet._dt.timestamp()*1000),
+                "created_at": Tweet.timestamp_milli,
                 "date": dt,
                 "timezone": Tweet.timezone,
                 "place": Tweet.place,
