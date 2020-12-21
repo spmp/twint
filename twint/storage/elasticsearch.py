@@ -269,11 +269,12 @@ def Tweet(Tweet, config):
         j_data["_source"].update({"photos": _photos})
     if Tweet.thumbnail:
         j_data["_source"].update({"thumbnail": Tweet.thumbnail})
+    ## The index for mentions is a hashtag normalised keyword, what we get here is an array, lets convert to a string
     if Tweet.mentions:
         _mentions = []
         for mention in Tweet.mentions:
             _mentions.append(mention)
-        j_data["_source"].update({"mentions": _mentions})
+        j_data["_source"].update({"mentions": str(_mentions)})
     if Tweet.urls:
         _urls = []
         for url in Tweet.urls:
