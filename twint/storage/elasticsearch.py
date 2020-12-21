@@ -58,7 +58,7 @@ def createIndex(config, instance, **scope):
                     "properties": {
                         "id": {"type": "long"},
                         "conversation_id": {"type": "long"},
-                        "created_at": {"type": "text"},
+                        "created_at": {"type": "long"},
                         "date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss"},
                         "timezone": {"type": "keyword"},
                         "place": {"type": "keyword"},
@@ -230,7 +230,7 @@ def Tweet(Tweet, config):
                 "id": str(Tweet.id),
                 "worker_id": config.Worker_ID,
                 "conversation_id": Tweet.conversation_id,
-                "created_at": Tweet.datetime,
+                "created_at": int(Tweet._dt.timestamp()*1000),
                 "date": dt,
                 "timezone": Tweet.timezone,
                 "place": Tweet.place,
